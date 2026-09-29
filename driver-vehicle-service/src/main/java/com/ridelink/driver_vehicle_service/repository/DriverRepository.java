@@ -11,9 +11,11 @@ public interface DriverRepository extends MongoRepository<Driver, String> {
 
     Optional<Driver> findByAccountId(String accountId);
 
-    List<Driver> findByAvailabilityStatus(DriverStatus availabilityStatus);
+    Optional<Driver> findByLicenseNumber(String licenseNumber);
 
-    List<Driver> findByServiceArea(String serviceArea);
+    boolean existsByLicenseNumber(String licenseNumber);
+
+    List<Driver> findByAvailabilityStatus(DriverStatus availabilityStatus);
 
     List<Driver> findByAvailabilityStatusAndServiceArea(
             DriverStatus availabilityStatus,
