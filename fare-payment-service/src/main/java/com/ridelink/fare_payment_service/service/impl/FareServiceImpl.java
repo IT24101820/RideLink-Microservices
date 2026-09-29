@@ -3,6 +3,8 @@ package com.ridelink.fare_payment_service.service.impl;
 import com.ridelink.fare_payment_service.dto.FareEstimateRequest;
 import com.ridelink.fare_payment_service.dto.FareResponse;
 import com.ridelink.fare_payment_service.dto.FinalFareRequest;
+import com.ridelink.fare_payment_service.exception.DuplicateFareException;
+import com.ridelink.fare_payment_service.exception.FareNotFoundException;
 import com.ridelink.fare_payment_service.model.Fare;
 import com.ridelink.fare_payment_service.model.FareStatus;
 import com.ridelink.fare_payment_service.repository.FareRepository;
@@ -27,7 +29,7 @@ public class FareServiceImpl implements FareService {
     @Override
     public FareResponse estimateFare(FareEstimateRequest request) {
         if (fareRepository.existsByRideId(request.getRideId())) {
-            throw new IllegalArgumentException("Fare already estimated for ride ID: " + request.getRideId());
+            throw new DuplicateFareException("Fare already estimated for ride ID: " + request.getRideId());
         }
 
         double distanceFare = request.getDistanceKm() * DISTANCE_RATE;
@@ -57,7 +59,7 @@ public class FareServiceImpl implements FareService {
     @Override
     public FareResponse finalizeFare(String fareId, FinalFareRequest request) {
         Fare fare = fareRepository.findById(fareId)
-                .orElseThrow(() -> new IllegalArgumentException("Fare not found with ID: " + fareId));
+                .orElseThrow(() -> new FareNotFoundException("Fare not found with ID: " + fareId));
 
         double distanceFare = request.getDistanceKm() * DISTANCE_RATE;
         double timeFare = request.getDurationMinutes() * TIME_RATE;
@@ -78,14 +80,14 @@ public class FareServiceImpl implements FareService {
     @Override
     public FareResponse getFareById(String fareId) {
         Fare fare = fareRepository.findById(fareId)
-                .orElseThrow(() -> new IllegalArgumentException("Fare not found with ID: " + fareId));
+                .orElseThrow(() -> new FareNotFoundException("Fare not found with ID: " + fareId));
         return mapToFareResponse(fare);
     }
 
     @Override
     public FareResponse getFareByRideId(String rideId) {
         Fare fare = fareRepository.findByRideId(rideId)
-                .orElseThrow(() -> new IllegalArgumentException("Fare not found for ride ID: " + rideId));
+                .orElseThrow(() -> new FareNotFoundException("Fare not found for ride ID: " + rideId));
         return mapToFareResponse(fare);
     }
 

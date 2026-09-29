@@ -2,6 +2,10 @@ package com.ridelink.fare_payment_service.service.impl;
 
 import com.ridelink.fare_payment_service.dto.CreatePaymentRequest;
 import com.ridelink.fare_payment_service.dto.PaymentResponse;
+import com.ridelink.fare_payment_service.exception.DuplicatePaymentException;
+import com.ridelink.fare_payment_service.exception.FareNotFoundException;
+import com.ridelink.fare_payment_service.exception.FareNotFinalizedException;
+import com.ridelink.fare_payment_service.exception.PaymentNotFoundException;
 import com.ridelink.fare_payment_service.model.Fare;
 import com.ridelink.fare_payment_service.model.FareStatus;
 import com.ridelink.fare_payment_service.model.Payment;
@@ -28,18 +32,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         Fare fare = fareRepository.findById(request.getFareId())
-                .orElseThrow(() -> new IllegalArgumentException("Fare not found with ID: " + request.getFareId()));
+                .orElseThrow(() -> new FareNotFoundException("Fare not found with ID: " + request.getFareId()));
 
         if (!fare.getRideId().equals(request.getRideId())) {
             throw new IllegalArgumentException("Fare does not belong to ride ID: " + request.getRideId());
         }
 
         if (fare.getStatus() != FareStatus.FINALIZED) {
-            throw new IllegalArgumentException("Payment can only be processed for a FINALIZED fare");
+            throw new FareNotFinalizedException("Payment can only be processed for a FINALIZED fare");
         }
 
         if (paymentRepository.existsByFareId(request.getFareId())) {
-            throw new IllegalArgumentException("Payment already created for fare ID: " + request.getFareId());
+            throw new DuplicatePaymentException("Payment already created for fare ID: " + request.getFareId());
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -63,14 +67,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse getPaymentById(String paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found with ID: " + paymentId));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found with ID: " + paymentId));
         return mapToPaymentResponse(payment);
     }
 
     @Override
     public PaymentResponse getPaymentByRideId(String rideId) {
         Payment payment = paymentRepository.findByRideId(rideId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found for ride ID: " + rideId));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found for ride ID: " + rideId));
         return mapToPaymentResponse(payment);
     }
 
