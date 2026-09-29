@@ -1,0 +1,16 @@
+package com.ridelink.driver_vehicle_service.repository;
+
+import com.ridelink.driver_vehicle_service.model.Vehicle;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface VehicleRepository extends MongoRepository<Vehicle, String> {
+
+    List<Vehicle> findByDriverId(String driverId);
+
+    Optional<Vehicle> findByRegistrationNumber(String registrationNumber);
+
+    boolean existsByRegistrationNumber(String registrationNumber);
+}
