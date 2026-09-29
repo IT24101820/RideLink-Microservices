@@ -1,6 +1,9 @@
 package com.ridelink.driver_vehicle_service.service;
 
 import com.ridelink.driver_vehicle_service.dto.*;
+import com.ridelink.driver_vehicle_service.exception.DriverNotFoundException;
+import com.ridelink.driver_vehicle_service.exception.DuplicateVehicleRegistrationException;
+import com.ridelink.driver_vehicle_service.exception.VehicleNotFoundException;
 import com.ridelink.driver_vehicle_service.model.Vehicle;
 import com.ridelink.driver_vehicle_service.model.VehicleStatus;
 import com.ridelink.driver_vehicle_service.repository.DriverRepository;
@@ -25,11 +28,11 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleResponse createVehicle(CreateVehicleRequest request) {
         if (!driverRepository.existsById(request.getDriverId())) {
-            throw new RuntimeException("Driver not found with id: " + request.getDriverId());
+            throw new DriverNotFoundException(request.getDriverId());
         }
 
         if (vehicleRepository.existsByRegistrationNumber(request.getRegistrationNumber())) {
-            throw new RuntimeException("Vehicle with registration number " + request.getRegistrationNumber() + " already exists");
+            throw new DuplicateVehicleRegistrationException(request.getRegistrationNumber());
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -53,14 +56,14 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleResponse getVehicleById(String id) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException(id));
         return mapToResponse(vehicle);
     }
 
     @Override
     public List<VehicleResponse> getVehiclesByDriverId(String driverId) {
         if (!driverRepository.existsById(driverId)) {
-            throw new RuntimeException("Driver not found with id: " + driverId);
+            throw new DriverNotFoundException(driverId);
         }
 
         return vehicleRepository.findByDriverId(driverId).stream()
@@ -71,12 +74,12 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleResponse updateVehicle(String id, UpdateVehicleRequest request) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException(id));
 
         if (request.getRegistrationNumber() != null && !request.getRegistrationNumber().isBlank()) {
             if (!request.getRegistrationNumber().equals(vehicle.getRegistrationNumber()) &&
                     vehicleRepository.existsByRegistrationNumber(request.getRegistrationNumber())) {
-                throw new RuntimeException("Vehicle with registration number " + request.getRegistrationNumber() + " already exists");
+                throw new DuplicateVehicleRegistrationException(request.getRegistrationNumber());
             }
             vehicle.setRegistrationNumber(request.getRegistrationNumber());
         }
@@ -109,7 +112,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleResponse updateVehicleStatus(String id, VehicleStatusUpdateRequest request) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException(id));
 
         vehicle.setStatus(request.getStatus());
         vehicle.setUpdatedAt(LocalDateTime.now());
