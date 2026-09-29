@@ -1,6 +1,8 @@
 package com.ridelink.driver_vehicle_service.service;
 
 import com.ridelink.driver_vehicle_service.dto.*;
+import com.ridelink.driver_vehicle_service.exception.DriverNotFoundException;
+import com.ridelink.driver_vehicle_service.exception.DuplicateLicenseException;
 import com.ridelink.driver_vehicle_service.model.Driver;
 import com.ridelink.driver_vehicle_service.model.DriverStatus;
 import com.ridelink.driver_vehicle_service.repository.DriverRepository;
@@ -22,9 +24,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse createDriver(CreateDriverRequest request) {
 
         if (driverRepository.existsByLicenseNumber(request.getLicenseNumber())) {
-            throw new RuntimeException(
-                    "Driver with license number " + request.getLicenseNumber() + " already exists"
-            );
+            throw new DuplicateLicenseException(request.getLicenseNumber());
         }
 
         Driver driver = Driver.builder()
@@ -41,9 +41,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse getDriverById(String id) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id: " + id)
-                );
+                .orElseThrow(() -> new DriverNotFoundException(id));
 
         return mapToResponse(driver);
     }
@@ -52,9 +50,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse updateDriver(String id, UpdateDriverRequest request) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id: " + id)
-                );
+                .orElseThrow(() -> new DriverNotFoundException(id));
 
         if (request.getLicenseNumber() != null) {
             driver.setLicenseNumber(request.getLicenseNumber());
@@ -73,9 +69,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse updateAvailability(String id, AvailabilityUpdateRequest request) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id: " + id)
-                );
+                .orElseThrow(() -> new DriverNotFoundException(id));
 
         driver.setAvailabilityStatus(request.getAvailabilityStatus());
         driver.setUpdatedAt(LocalDateTime.now());
@@ -87,9 +81,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse updateLocation(String id, LocationUpdateRequest request) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id: " + id)
-                );
+                .orElseThrow(() -> new DriverNotFoundException(id));
 
         driver.setLatitude(request.getLatitude());
         driver.setLongitude(request.getLongitude());
@@ -102,9 +94,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse updateServiceArea(String id, ServiceAreaUpdateRequest request) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id: " + id)
-                );
+                .orElseThrow(() -> new DriverNotFoundException(id));
 
         driver.setServiceArea(request.getServiceArea());
         driver.setUpdatedAt(LocalDateTime.now());
