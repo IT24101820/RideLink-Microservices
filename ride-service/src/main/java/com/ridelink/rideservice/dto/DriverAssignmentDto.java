@@ -9,5 +9,5 @@ import lombok.Setter;
 public class DriverAssignmentDto {
 
     @NotNull(message = "Driver ID is required")
-    private Long driverId;
+    private String driverId;
 }

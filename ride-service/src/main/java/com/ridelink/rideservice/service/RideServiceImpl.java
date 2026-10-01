@@ -50,7 +50,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public List<RideResponseDto> getRidesByDriverId(Long driverId) {
+    public List<RideResponseDto> getRidesByDriverId(String driverId) {
         return rideRepository.findByDriverId(driverId)
                 .stream()
                 .map(this::mapToDto)
