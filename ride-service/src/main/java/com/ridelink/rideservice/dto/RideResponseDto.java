@@ -16,7 +16,7 @@ public class RideResponseDto {
 
     private Long id;
     private Long passengerId;
-    private Long driverId;
+    private String driverId;
     private String pickupLocation;
     private String destination;
     private RideStatus status;

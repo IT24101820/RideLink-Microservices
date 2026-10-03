@@ -14,7 +14,7 @@ public interface RideService {
 
     List<RideResponseDto> getRidesByPassengerId(Long passengerId);
 
-    List<RideResponseDto> getRidesByDriverId(Long driverId);
+    List<RideResponseDto> getRidesByDriverId(String driverId);
 
     RideResponseDto assignDriver(Long rideId, DriverAssignmentDto request);
 

@@ -12,7 +12,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     List<Ride> findByPassengerId(Long passengerId);
 
-    List<Ride> findByDriverId(Long driverId);
+    List<Ride> findByDriverId(String driverId);
 
     List<Ride> findByStatus(RideStatus status);
 }

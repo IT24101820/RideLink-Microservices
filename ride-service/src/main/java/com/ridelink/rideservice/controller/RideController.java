@@ -50,7 +50,7 @@ public class RideController {
 
     @GetMapping("/driver/{driverId}")
     public ResponseEntity<List<RideResponseDto>> getDriverRides(
-            @PathVariable Long driverId) {
+            @PathVariable String driverId) {
 
         return ResponseEntity.ok(
                 rideService.getRidesByDriverId(driverId)

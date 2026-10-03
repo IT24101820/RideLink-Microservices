@@ -21,7 +21,7 @@ public class Ride {
     @Column(nullable = false)
     private Long passengerId;
 
-    private Long driverId;
+    private String driverId;
 
     @Column(nullable = false)
     private String pickupLocation;
